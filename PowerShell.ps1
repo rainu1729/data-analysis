@@ -273,3 +273,42 @@ $workbook.close()
 $exobj.quit()
 
 Release-Ref($exobj)
+
+ ###########################################################
+
+count spool stmt
+
+set feedback off;
+set echo off;
+set heading off;
+SET TRIMSPOOL off;
+set termout off;
+
+to remove blank lines
+(gc new_count.log) | ? {$_.trim() -ne "" } | set-content new_count.log
+(gc select_out.log) | ? {$_.trim() -ne "" } | set-content select_out.log
+
+remove lines with unwanted character
+get-content new_count.log | select-string -pattern 'SQL>' -notmatch | set-content new_count1.log
+
+
+read file one after onother
+$regex='SQL>'
+
+Get-Content C:\Users\rainu\Desktop\Sample_File\new_count.log | ForEach-Object {
+    if ($_ -notmatch $regex -and $_.trim() -ne "") 
+    {     
+           if($_.trim() -eq 1)
+            {WRITE-HOST 'update column as S'}
+    }
+    
+    }  
+	
+Get-Content C:\Users\rainu\Desktop\Sample_File\select_out.log | ForEach-Object {
+    if ($_ -notmatch $regex -and $_.trim() -ne "") 
+    {     
+	WRITE-HOST $_
+    }
+    
+    }  	
+    ###########################################################
