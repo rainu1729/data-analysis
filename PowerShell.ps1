@@ -276,17 +276,76 @@ Release-Ref($exobj)
 
  ###########################################################
 
-count spool stmt
+###insert stmt sql file format
+set echo off;
+set feedback off;
+set serveroutput on;
+spool insert_log.log
+begin
+insert into table1 (column1,column2,column3) values ('1','2','21-DEC-1991');
+dbms_output.put_line('S');
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+insert into table2 (column1,column2,column3) values (1,'2','21-DEC-1991');
+dbms_output.put_line('S');
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+insert into table3 (column1,column2,column3) values ('1','2',NULL);
+dbms_output.put_line('S');
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+insert into table4 (column1,column2,column3) values ('1','2','21-DEC-1991');
+dbms_output.put_line('S');
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+spool off;
+commit;
 
+###the spool OUTPUT of insert file
+S                                                                               
+S                                                                               
+E                                                                               
+S                                                                               
+
+##the above can be used to update the excel with the insert status of the specific column
+
+### count statement sql file ########
 set feedback off;
 set echo off;
 set heading off;
 SET TRIMSPOOL off;
 set termout off;
+spool count_log.log
+select count(*) from table1 where column1=1;
+select count(*) from table2 where column1=1;
+select count(*) from table3 where column1=1;
+select count(*) from table4 where column1=1;
+spool off;
 
-to remove blank lines
-(gc new_count.log) | ? {$_.trim() -ne "" } | set-content new_count.log
-(gc select_out.log) | ? {$_.trim() -ne "" } | set-content select_out.log
+##count spool output 
+
+         2                                                                      
+
+         4                                                                      
+
+         2                                                                      
+
+         4                                                                      
+
+##to remove blank lines and space from the log file
+(gc count_log.log) | ? {$_.trim() -ne "" } | ForEach-Object{$_.Replace(' ',$null)} |set-content count_log.log
+
 
 remove lines with unwanted character
 get-content new_count.log | select-string -pattern 'SQL>' -notmatch | set-content new_count1.log
