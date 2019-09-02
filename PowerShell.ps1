@@ -346,6 +346,70 @@ spool off;
 ##to remove blank lines and space from the log file
 (gc count_log.log) | ? {$_.trim() -ne "" } | ForEach-Object{$_.Replace(' ',$null)} |set-content count_log.log
 
+###update statement sql file
+
+set echo off;
+set feedback off;
+set serveroutput on;
+spool update_log.log
+begin
+update table1 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1='1';
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+update table2 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1=1;
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+update table3 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1='1';
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+update table4 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1='1';
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+spool off;
+commit;
+
+
+#######update log file
+S                                                                               
+S                                                                               
+E                                                                               
+S                                                                               
+
+
+
+
+
 
 remove lines with unwanted character
 get-content new_count.log | select-string -pattern 'SQL>' -notmatch | set-content new_count1.log
