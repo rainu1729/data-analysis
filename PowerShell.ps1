@@ -406,6 +406,30 @@ S
 E                                                                               
 S                                                                               
 
+###select sql file
+spool select_log.log
+select 'TABLE1',MAX(column3) from table1 where column1='1';
+select 'TABLE2',MAX(column3) from table2 where column1='1';
+select 'TABLE3',MAX(column3) from table3 where column1='1';
+select 'TABLE4',MAX(column3) from table4 where column1='1';
+spool off;
+
+
+####select log file output
+
+TABLE1 21-DEC-91                                                                
+
+TABLE2 21-DEC-91                                                                
+
+TABLE3                                                                          
+
+TABLE4 21-DEC-91                                                                
+
+
+##### remove the blank lines from the log file
+(gc select_log.log) | ? {$_.trim() -ne "" } | set-content select_log.log
+
+
 
 
 
