@@ -430,8 +430,63 @@ TABLE4 21-DEC-91
 (gc select_log.log) | ? {$_.trim() -ne "" } | set-content select_log.log
 
 
+###delete sql file
+set echo off;
+set feedback off;
+set serveroutput on;
+spool delete_log.log
+begin
+delete from table1 where column1='1';
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+delete from table2 where column1='1';
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+delete from table3 where column1='1';
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+begin
+delete from table4 where column1='1';
+if sql%rowcount=1 then
+dbms_output.put_line('S');
+elsif sql%rowcount=0 then
+dbms_output.put_line('E');
+end if;
+exception when others then
+dbms_output.put_line('E');
+end;
+/
+spool off;
+commit;
 
-
+###delete log file output
+S                                                                               
+S                                                                               
+E                                                                               
+S                                                                               
 
 
 
