@@ -283,40 +283,42 @@ set serveroutput on;
 spool insert_log.log
 begin
 insert into table1 (column1,column2,column3) values ('1','2','21-DEC-1991');
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE1,S');
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE1,E');
 end;
 /
 begin
 insert into table2 (column1,column2,column3) values (1,'2','21-DEC-1991');
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE2,S');
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE2,E');
 end;
 /
 begin
 insert into table3 (column1,column2,column3) values ('1','2',NULL);
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE3,S');
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE3,E');
 end;
 /
 begin
 insert into table4 (column1,column2,column3) values ('1','2','21-DEC-1991');
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE4,S');
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE4,E');
 end;
 /
 spool off;
 commit;
 
+
 ###the spool OUTPUT of insert file
-S                                                                               
-S                                                                               
-E                                                                               
-S                                                                               
+TABLE1,S                                                                        
+TABLE2,S                                                                        
+TABLE3,E                                                                        
+TABLE4,E                                                                        
+                                                                               
 
 ##the above can be used to update the excel with the insert status of the specific column
 
@@ -327,21 +329,22 @@ set heading off;
 SET TRIMSPOOL off;
 set termout off;
 spool count_log.log
-select count(*) from table1 where column1=1;
-select count(*) from table2 where column1=1;
-select count(*) from table3 where column1=1;
-select count(*) from table4 where column1=1;
+select DECODE(count(1),1,'S','E'),',TABLE1' from table1 where column1=1;
+select DECODE(count(1),1,'S','E'),',TABLE2' from table2 where column1=1;
+select DECODE(count(1),1,'S','E'),',TABLE3' from table3 where column1=1;
+select DECODE(count(1),1,'S','E'),',TABLE4' from table4 where column1=1;
 spool off;
 
 ##count spool output 
 
-         2                                                                      
+S ,TABLE1                                                                       
 
-         4                                                                      
+S ,TABLE2                                                                       
 
-         2                                                                      
+E ,TABLE3                                                                       
 
-         4                                                                      
+E ,TABLE4                                                                       
+                                                                     
 
 ##to remove blank lines and space from the log file
 (gc count_log.log) | ? {$_.trim() -ne "" } | ForEach-Object{$_.Replace(' ',$null)} |set-content count_log.log
@@ -355,45 +358,45 @@ spool update_log.log
 begin
 update table1 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1='1';
 if sql%rowcount=1 then
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE1,S');
 elsif sql%rowcount=0 then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE1,E');
 end if;
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE1,E');
 end;
 /
 begin
 update table2 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1=1;
 if sql%rowcount=1 then
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE2,S');
 elsif sql%rowcount=0 then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE2,E');
 end if;
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE2,E');
 end;
 /
 begin
 update table3 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1='1';
 if sql%rowcount=1 then
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE3,S');
 elsif sql%rowcount=0 then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE3,E');
 end if;
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE3,E');
 end;
 /
 begin
 update table4 set column3=to_Date('21-12-1991','DD-MM-YYYY') where column1='1';
 if sql%rowcount=1 then
-dbms_output.put_line('S');
+dbms_output.put_line('TABLE3,S');
 elsif sql%rowcount=0 then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE4,E');
 end if;
 exception when others then
-dbms_output.put_line('E');
+dbms_output.put_line('TABLE4,E');
 end;
 /
 spool off;
@@ -401,17 +404,18 @@ commit;
 
 
 #######update log file
-S                                                                               
-S                                                                               
-E                                                                               
-S                                                                               
+TABLE1,S                                                                        
+TABLE2,S                                                                        
+TABLE3,E                                                                        
+TABLE4,E                                                                        
+                                                                           
 
 ###select sql file
 spool select_log.log
-select 'TABLE1',MAX(column3) from table1 where column1='1';
-select 'TABLE2',MAX(column3) from table2 where column1='1';
-select 'TABLE3',MAX(column3) from table3 where column1='1';
-select 'TABLE4',MAX(column3) from table4 where column1='1';
+select 'TABLE1,',MAX(column3) from table1 where column1='1';
+select 'TABLE2,',MAX(column3) from table2 where column1='1';
+select 'TABLE3,',MAX(column3) from table3 where column1='1';
+select 'TABLE4,',MAX(column3) from table4 where column1='1';
 spool off;
 
 
